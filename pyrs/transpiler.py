@@ -330,6 +330,13 @@ class RustTranspiler(CLikeTranspiler):
         if ret in self._attr_dispatch_table:
             ret = self._attr_dispatch_table[ret]
             return ret(self, node, value_id, attr)
+
+        # Check if the attribute is callable and add parentheses if it is
+        if hasattr(node, "scopes"):
+            definition = node.scopes.find(value_id)
+            if isinstance(definition, ast.FunctionDef):
+                return f"{ret}()"
+
         return ret
 
     def _func_for_lookup(self, fname) -> Union[str, object]:
